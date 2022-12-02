@@ -1,6 +1,6 @@
 import logging
 
-from huobi.connection.impl.restapi_invoker import call_sync, call_sync_perforence_test
+from huobi.connection.impl.restapi_invoker import call_sync, call_sync_performance_test
 from huobi.connection.impl.restapi_request import RestApiRequest
 from huobi.constant import *
 from huobi.utils import *
@@ -26,6 +26,7 @@ class RestApiSyncClient(object):
         self.__server_url = kwargs.get("url", get_default_server_url(None))
         self.__init_log = kwargs.get("init_log", None)
         self.__performance_test = kwargs.get("performance_test", None)
+        self.__proxies = kwargs.get('proxies', None)
         if self.__init_log and self.__init_log:
             logger = logging.getLogger("huobi-client")
             logger.setLevel(level=logging.INFO)
@@ -39,6 +40,7 @@ class RestApiSyncClient(object):
         request.host = self.__server_url
         request.header.update({'Content-Type': 'application/json'})
         request.url = url + builder.build_url()
+        request.proxies = self.__proxies
         return request
 
     def __create_request_by_post_with_signature(self, url, builder):
@@ -52,6 +54,7 @@ class RestApiSyncClient(object):
         else:
             request.post_body = builder.post_map
         request.url = url + builder.build_url()
+        request.proxies = self.__proxies
         return request
 
     def __create_request_by_get_with_signature(self, url, builder):
@@ -61,6 +64,7 @@ class RestApiSyncClient(object):
         create_signature(self.__api_key, self.__secret_key, request.method, request.host + url, builder)
         request.header.update({"Content-Type": "application/x-www-form-urlencoded"})
         request.url = url + builder.build_url()
+        request.proxies = self.__proxies
         return request
 
     def create_request(self, method, url, params, parse):
@@ -125,7 +129,7 @@ class RestApiSyncClient(object):
     def request_process_performance(self, method, url, params, parse):
         request = self.create_request(method, url, params, parse)
         if request:
-            return call_sync_perforence_test(request)
+            return call_sync_performance_test(request)
 
         return None, 0, 0
 
@@ -148,7 +152,7 @@ class RestApiSyncClient(object):
     def request_process_post_batch_performance(self, method, url, params, parse):
         request = self.create_request_post_batch(method, url, params, parse)
         if request:
-            return call_sync_perforence_test(request)
+            return call_sync_performance_test(request)
 
         return None, 0, 0
 

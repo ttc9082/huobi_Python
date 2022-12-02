@@ -50,7 +50,7 @@ def check_response(dict_data):
 def call_sync(request, is_checked=False):
     if request.method == "GET":
         # print("call_sync url : " , request.host + request.url)
-        response = session.get(request.host + request.url, headers=request.header)
+        response = session.get(request.host + request.url, headers=request.header, proxies=request.proxies)
         if is_checked is True:
             return response.text
         dict_data = json.loads(response.text, encoding="utf-8")
@@ -59,18 +59,19 @@ def call_sync(request, is_checked=False):
         return request.json_parser(dict_data)
 
     elif request.method == "POST":
-        response = session.post(request.host + request.url, data=json.dumps(request.post_body), headers=request.header)
+        response = session.post(request.host + request.url, data=json.dumps(request.post_body), headers=request.header, proxies=request.proxies)
         dict_data = json.loads(response.text, encoding="utf-8")
         # print("call_sync  === recv data : ", dict_data)
         check_response(dict_data)
         return request.json_parser(dict_data)
 
-def call_sync_perforence_test(request, is_checked=False):
+
+def call_sync_performance_test(request, is_checked=False):
     if request.method == "GET":
         inner_start_time = time.time()
-        # print("call_sync_perforence_test url : ", request.host + request.url)
-        response = session.get(request.host + request.url, headers=request.header)
-        #print("call_sync_perforence_test data :", response.text)
+        # print("call_sync_performance_test url : ", request.host + request.url)
+        response = session.get(request.host + request.url, headers=request.header, proxies=request.proxies)
+        # print("call_sync_performance_test data :", response.text)
         inner_end_time = time.time()
         cost_manual = round(inner_end_time - inner_start_time, 6)
         req_cost = response.elapsed.total_seconds()
@@ -83,7 +84,7 @@ def call_sync_perforence_test(request, is_checked=False):
 
     elif request.method == "POST":
         inner_start_time = time.time()
-        response = session.post(request.host + request.url, data=json.dumps(request.post_body), headers=request.header)
+        response = session.post(request.host + request.url, data=json.dumps(request.post_body), headers=request.header, proxies=request.proxies)
         inner_end_time = time.time()
         cost_manual = round(inner_end_time - inner_start_time, 6)
         req_cost = response.elapsed.total_seconds()

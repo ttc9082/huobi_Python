@@ -8,4 +8,5 @@ class RestApiRequest(object):
         self.post_body = ""
         self.header = dict()
         self.json_parser = None
+        self.proxies = None
 
